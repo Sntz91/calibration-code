@@ -120,7 +120,14 @@ def print_errors(predicted_reference_pts_tv, reference_pts_tv_arr, predicted_val
 def calculate_errors(pred_pts, gt_pts):
     return [np.linalg.norm(pred-gt) for pred, gt in zip(pred_pts[:, :2], gt_pts[:, :2])]
 
-def get_result_dict(point_dict_pv, point_arr_tv, predicted_points_tv, errors, densities):
+def calc_distance(a, b):
+    return sum((y-x)**2 for x, y in zip(a, b)) ** 0.5
+
+def get_nearest_point_distance(point, point_list):
+    distances = [calc_distance(point, pt) for pt in point_list]
+    return min(distances)
+
+def get_result_dict(point_dict_pv, point_arr_tv, predicted_points_tv, errors, densities, reference_pts_pv):
     error_dict = {}
     for i, (name, coord) in enumerate(point_dict_pv.items()):
         error_dict[name] = {}
@@ -129,6 +136,7 @@ def get_result_dict(point_dict_pv, point_arr_tv, predicted_points_tv, errors, de
         error_dict[name]['predicted_coordinates_tv'] = (predicted_points_tv[i][0], predicted_points_tv[i][1])
         error_dict[name]['error'] = errors[i]
         error_dict[name]['pixel_density'] = densities[i]
+        error_dict[name]['distance_to_next_ref_pt'] = get_nearest_point_distance(coord, reference_pts_pv)
     return error_dict
 
 # Get Point Density
