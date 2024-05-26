@@ -80,9 +80,9 @@ def plot_setup(img_tv, img_pv, reference_result_dict, validation_result_dict):
     plt.subplots_adjust(bottom=0, wspace=0)
     plt.show()
 
-def plot_predictions(img_tv, img_pv, reference_result_dict, validation_result_dict):
+def plot_predictions(img_tv, img_pv, reference_result_dict, validation_result_dict, fname=False):
     fig, ax = plt.subplots(1, 1, figsize=(12, 5))
-    fig.suptitle('Reference- and Validation Points, their Predictions, and Error')
+    # fig.suptitle('Reference- and Validation Points, their Predictions, and Error')
     ax.imshow(img_tv)
     ax.axis('off')
     x_offset = -150
@@ -96,14 +96,22 @@ def plot_predictions(img_tv, img_pv, reference_result_dict, validation_result_di
                     bbox=dict(facecolor='whitesmoke', edgecolor='white', boxstyle="round", alpha=0.8))
         
     # Validation Points
+    errors = []
     for name, pt in validation_result_dict.items():
+        errors.append(pt["error"])
         ax.plot(pt['coordinates_tv'][0], pt['coordinates_tv'][1], marker='X', color='steelblue', markersize=8)  
         ax.plot(pt['predicted_coordinates_tv'][0], pt['predicted_coordinates_tv'][1], marker='X', color='cyan', markersize=8)
         ax.annotate(f'{pt["error"]:.2f}', 
                     xy=(pt['coordinates_tv'][0]+x_offset, pt['coordinates_tv'][1]+y_offset),
                     bbox=dict(facecolor='steelblue', edgecolor='royalblue', boxstyle="round", alpha=0.8),
                     color='white')
-    plt.show()
+
+    # Mean Error:
+    ax.annotate(f'{np.mean(errors) / SCALING_FACTOR * 100 :.2f} cm', xy=(100, 150), color='white',
+        bbox=dict(facecolor='black', edgecolor='white', boxstyle='round', alpha=0.8))
+    # if name:
+        # plt.savefig(f'predictions_{fname}.png', dpi=300)
+    return ax
 
 
 # Calculate Errors
@@ -206,6 +214,7 @@ def plot_setup_noised(img_tv, img_pv, reference_result_dict, validation_result_d
                     xytext=(pt['coordinates_tv'][0], pt['coordinates_tv'][1]),
                     #arrowprops=dict(facecolor='black'))
                     arrowprops=dict(arrowstyle="simple", facecolor='black'))
+    # plt.savefig('setup_noised.png', dpi=300)
 
 
 # OUTLIER -----------
